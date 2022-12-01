@@ -288,7 +288,7 @@ spoofchk|query_rss|trust|protodown) || $prev2 == protodown_reason ]]; then
         words=$'off\nobject\npinned'
     elif [[ $prev == object ]]; then
         words=$'FILE\nsection\nverbose'
-    elif [[ $prev2 == object ]]; then
+    elif [[ $sub_line == *" object "* ]]; then
         words=$'section\nverbose\n'$opts
     elif [[ $prev == pinned ]]; then
         words="FILE"
