@@ -1,4 +1,4 @@
-## ip Command Bash Completion
+## ip Bash Completion
 
 This is an enhanced version of the existing ip command's autocomplete function.  
 This function is based on the help message output by the ip command.
