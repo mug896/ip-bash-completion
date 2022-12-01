@@ -259,6 +259,7 @@ _ip_link_add()
     [[ ${sub_line/%+( )/} == @(link|parentdev)+( )+([^ ]) ]] && words="name"
     [[ -n $words ]] && return
     local opts=$'txqueuelen\naddress\nbroadcast\nmtu\nindex\nnumtxqueues\nnumrxqueues\ntype'
+    echo xxxxx
     _ip_link_type
 }
 _ip_link_set()
@@ -777,7 +778,7 @@ _ip()
 -n:|-netns:|-N|-Numeric|-a|-all|-t|-timestamp|-ts|-tshort|-rc:|-rcvbuf:|-iec|\
 -br|-brief|-j|-json|-p|-pretty|-force|(-c|-color)(=(always|auto|never))?"
 
-    regex="^$cmd[ ]+((${options//:/[ ]+$colon})[ ]+)*(${objs})[ ]+(.*)"
+    local regex="^$cmd[ ]+((${options//:/[ ]+$colon})[ ]+)*(${objs})[ ]+(.*)"
     if [[ $cur == -* && $comp_line2 != *" address "@(save|flush|show)" "* ]]; then
         options=${options/%\(-c|-color)(=(always|auto|never))?/-c=|-color=}
         words=${options//?(:)|/$'\n'}
