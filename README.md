@@ -5,8 +5,8 @@ This function is based on the help message output by the ip command.
 
 ```sh
 bash$ hostnamectl
-Operating System: Ubuntu 22.04.1 LTS
-          Kernel: Linux 5.15.0-43-generic
+Operating System: Ubuntu 22.10                    
+          Kernel: Linux 5.19.0-23-generic
     Architecture: x86-64
 
 bash$ ip -Version
