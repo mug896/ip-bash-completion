@@ -288,7 +288,7 @@ spoofchk|query_rss|trust|protodown) || $prev2 == protodown_reason ]]; then
         words=$'off\nobject\npinned'
     elif [[ $prev == object ]]; then
         words=$'FILE\nsection\nverbose'
-    elif [[ $sub_line == *" object "* ]]; then
+    elif [[ $sub_line == *" object "* && $sub_line != *" type "* ]]; then
         words=$'section\nverbose\n'$opts
     elif [[ $prev == pinned ]]; then
         words="FILE"
@@ -300,7 +300,7 @@ spoofchk|query_rss|trust|protodown) || $prev2 == protodown_reason ]]; then
         words=$'mac\nvlan\nrate\nmax_tx_rate\nmin_tx_rate\nspoofchk\nquery_rss\nstate\ntrust\nnode_guid\nport_guid'
     elif [[ $prev == proto ]]; then
         words=$'802.1Q\n802.1ad'
-    elif [[ $sub_line == *" vf "*" vlan "* ]]; then
+    elif [[ $sub_line == *" vf "*" vlan "* && $sub_line != *" type "* ]]; then
         words=$'qos\nproto\n'$opts
     elif [[ $sub_line == *" vf "*" state "$cur ]]; then
         words=$'auto\nenable\ndisable'
