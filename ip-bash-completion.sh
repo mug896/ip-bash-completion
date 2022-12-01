@@ -143,7 +143,7 @@ _ip_route()
             esac
             ;;
         add | del | change | append | replace)
-            local prefix=$( ip route | cut -d ' ' -f 1 )
+            local prefix=$( ip route | gawk '{ print $1 }' )
             if [[ -z ${sub_line%$cur_o} ]]; then
                 words=${type//|/$'\n'}$'\n'$prefix
                 return
