@@ -274,6 +274,8 @@ protodown\nprotodown_reason\ngso_max_size\ngso_max_segs'
     if [[ $prev == @(arp|dynamic|multicast|allmulticast|promisc|trailers|carrier\
 spoofchk|query_rss|trust|protodown) || $prev2 == protodown_reason ]]; then
         words=$'on\noff'
+    elif [[ $prev == netns ]]; then
+        words=$'PID\nNAME'
     elif [[ $prev == @(xdp|xdpgeneric|xdpdrv|xdpoffload) ]]; then
         words=$'off\nobject\npinned'
     elif [[ $prev == object ]]; then
