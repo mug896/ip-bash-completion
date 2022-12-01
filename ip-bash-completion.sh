@@ -307,8 +307,7 @@ spoofchk|query_rss|trust|protodown) || $prev2 == protodown_reason ]]; then
 }
 _ip_link()
 {
-    local cmd3
-    local cmd3_list='add|delete|set|show|xstats|afstats|property|help'
+    local cmd3 cmd3_list='add|delete|set|show|xstats|afstats|property|help'
     _ip_cmd3; [[ -n $words ]] && return
     case $cmd3 in
         add)
@@ -353,8 +352,7 @@ _ip_link()
 }
 _ip_address()
 {
-    local cmd3
-    local cmd3_list='add|change|replace|del|save|flush|show|showdump|restore|help'
+    local cmd3 cmd3_list='add|change|replace|del|save|flush|show|showdump|restore|help'
     _ip_cmd3; [[ -n $words ]] && return
     case $cmd3 in
         add|change|replace|del)
