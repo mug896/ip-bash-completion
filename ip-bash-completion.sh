@@ -9,7 +9,7 @@ _init_comp_wordbreaks()
         "$'PROMPT_COMMAND=${PROMPT_COMMAND#*$\'\\n\'}\n'$PROMPT_COMMAND
     fi
 }
-_ip_get_data()
+_ip_data()
 {
     if [[ $1 == interface && $2 == up ]]; then
         ip link show up | sed -En 's/^[0-9]+:[ ]+([^:]+).*/\1/p'
@@ -88,7 +88,7 @@ expires\nfastopen_no_cookie'
     local family='inet|inet6|mpls|bridge|link'
     case $prev in
         via) words=${family//|/$'\n'}$'\nADDRESS' ;;
-        dev) words=$( _ip_get_data interface up ) ;;
+        dev) words=$( _ip_data interface up ) ;;
         weight) words="NUMBER" ;;
         nhid) words="ID" ;;
         pref) words=$'low\nmedium\nhigh' ;;
@@ -262,9 +262,9 @@ _ip_link_add()
 _ip_link_set()
 {
     case $prev in
-        set) words=$( _ip_get_data interface )$'\ndev\ngroup' ;;
-        dev) words=$( _ip_get_data interface ) ;;
-        group) words=$( _ip_get_data iproute2_etc group ) ;;
+        set) words=$( _ip_data interface )$'\ndev\ngroup' ;;
+        dev) words=$( _ip_data interface ) ;;
+        group) words=$( _ip_data iproute2_etc group ) ;;
     esac
     [[ -n $words ]] && return
     opts=$'up\ndown\ntype\narp\ndynamic\nmulticast\nallmulticast\npromisc\ntrailers
@@ -317,20 +317,20 @@ _ip_link()
             _ip_link_set ;;
         delete)
             case $prev in
-                $cmd3) words=$( _ip_get_data interface )$'\ndev\ngroup' ;;
-                dev) words=$( _ip_get_data interface ) ;;
-                group) words=$( _ip_get_data iproute2_etc group ) ;;
+                $cmd3) words=$( _ip_data interface )$'\ndev\ngroup' ;;
+                dev) words=$( _ip_data interface ) ;;
+                group) words=$( _ip_data iproute2_etc group ) ;;
                 type) words=$type ;;
                 *) opts="type"
                     _ip_link_type
             esac ;;
         show)
             case $prev in
-                group) words=$( _ip_get_data iproute2_etc group ) ;;
-                master) words=$( _ip_get_data interface ) ;;
+                group) words=$( _ip_data iproute2_etc group ) ;;
+                master) words=$( _ip_data interface ) ;;
                 type) words=$type ;;
                 *) 
-                    words=$( _ip_get_data interface )$'\ngroup'
+                    words=$( _ip_data interface )$'\ngroup'
                     words+=$'\nup\nmaster\nvrf\ntype' ;;
             esac ;;
         xstats) 
@@ -339,13 +339,13 @@ _ip_link()
         afstats)
             case $prev in
                 $cmd3) words="dev" ;;
-                dev) words=$( _ip_get_data interface ) ;;
+                dev) words=$( _ip_data interface ) ;;
             esac ;;
         property) 
             case $prev in
                 $cmd3) words=$'add\ndel' ;;
                 @(add|del)) words="dev" ;;
-                dev) words=$( _ip_get_data interface ) ;;
+                dev) words=$( _ip_data interface ) ;;
                 *) [[ $prev2 == dev ]] && words="altname" ;;
             esac ;;
         help) [[ $prev == $cmd3 ]] && words=$type ;;
@@ -360,7 +360,7 @@ _ip_address()
             [[ $sub_line != *" dev "* ]] &&
                 words=$'PREFIX\nADDR peer PREFIX\nbroadcast\nanycast\nlabel\nscope\ndev'
             [[ $prev == scope ]] && words=$'host\nlink\nglobal\nNUMBER'
-            [[ $prev == dev ]] && words=$( _ip_get_data interface )
+            [[ $prev == dev ]] && words=$( _ip_data interface )
             [[ $prev == @(valid_lft|preferred_lft) ]] && words=$'forever\nSECONDS'
             if [[ -z $words ]]; then
                 if [[ $cmd3 == del ]]; then
@@ -370,7 +370,7 @@ _ip_address()
                 fi
             fi ;;
         save|flush|show) 
-            [[ $prev == dev ]] && words=$( _ip_get_data interface )
+            [[ $prev == dev ]] && words=$( _ip_data interface )
             [[ $prev == scope ]] && words=$'host\nlink\nglobal\nNUMBER'
             [[ $prev == type ]] && words=$type
             if [[ -z $words ]]; then 
@@ -391,7 +391,7 @@ _ip_addrlabel()
     _ip_cmd3; [[ -n $words ]] && return
     [[ $prev == @(add|del) ]] && words="prefix"
     [[ $sub_line == "prefix "* ]] && words=$'dev\nlabel'
-    [[ $prev == dev ]] && words=$( _ip_get_data interface )
+    [[ $prev == dev ]] && words=$( _ip_data interface )
 }
 _ip_fou()
 {
@@ -483,13 +483,13 @@ _ip_maddress()
     words=$'add\ndel\nshow\nhelp\nMULTIADDR'
     [[ $prev == show || $prev2 == @(maddress|maddr|add|del) ]] && words="dev"
     [[ $prev == @(add|del) ]] && words="MULTIADDR"
-    [[ $prev == dev ]] && words=$( _ip_get_data interface )
+    [[ $prev == dev ]] && words=$( _ip_data interface )
 }
 _ip_monitor()
 {
     words=$'all\naddress\nlink\nmroute\nneigh\nnetconf\nnexthop\nnsid\nprefix\nroute
 rule\nfile\nlabel\nall-nsid\ndev\nhelp'
-    [[ $prev == dev ]] && words=$( _ip_get_data interface up )
+    [[ $prev == dev ]] && words=$( _ip_data interface up )
 }
 _ip_mptcp()
 {
@@ -538,14 +538,14 @@ _ip_neighbor()
             [[ $prev == get ]] && words=$'ADDR\nproxy' || words="dev" ;;
     esac
     [[ $prev == nud ]] && words=$'delay\nfailed\nincomplete\nnoarp\nnone\npermanent\nprobe\nreachable\nstale'
-    [[ $prev == dev ]] && words=$( _ip_get_data interface )
+    [[ $prev == dev ]] && words=$( _ip_data interface )
     [[ $cmd3 == @(add|del|change|replace|get) && $prev == proxy ]] && words="ADDR"
 }
 _ip_netconf()
 {
     [[ $prev == netconf ]] && words=$'show\nhelp'
     [[ $prev == show ]] && words="dev"
-    [[ $prev == dev ]] && words=$( _ip_get_data interface )
+    [[ $prev == dev ]] && words=$( _ip_data interface )
 }
 _ip_netns()
 {
@@ -609,7 +609,7 @@ _ip_nexthop()
     [[ $cmd3 == bucket && $prev2 == id ]] && words="index"
     [[ $prev == encap ]] && words="mpls"
     [[ $prev2 == encap ]] && words="MPLSLABEL"
-    [[ $prev == @(dev|master) ]] && words=$( _ip_get_data interface )
+    [[ $prev == @(dev|master) ]] && words=$( _ip_data interface )
 }
 _ip_ntable()
 {
@@ -620,7 +620,7 @@ _ip_ntable()
 base_reachable\nretrans\ngc_stale\ndelay_probe\nqueue\napp_probes\nucast_probes
 mcast_probes\nanycast_delay\nproxy_delay\nproxy_queue\nlocktime'
     [[ $prev == change ]] && words="name"
-    [[ $prev == dev ]] && words=$( _ip_get_data interface )
+    [[ $prev == dev ]] && words=$( _ip_data interface )
 }
 _ip_sr()
 {
@@ -651,7 +651,7 @@ _ip_tcpmetrics()
 _ip_token()
 {
     words=$'list\nset\ndel\nget\nTOKEN\ndev\nhelp'
-    [[ $prev == dev ]] && words=$( _ip_get_data interface )
+    [[ $prev == dev ]] && words=$( _ip_data interface )
 }
 _ip_tunnel()
 {
