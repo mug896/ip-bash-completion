@@ -286,8 +286,12 @@ spoofchk|query_rss|trust|protodown) || $prev2 == protodown_reason ]]; then
         words=$'on\noff'
     elif [[ $prev == @(xdp|xdpgeneric|xdpdrv|xdpoffload) ]]; then
         words=$'off\nobject\npinned'
-    elif [[ $sub_line == *@(xdp|xdpgeneric|xdpdrv|xdpoffload)\ object* ]]; then
-        words=$'section\nverbose'
+    elif [[ $prev == object ]]; then
+        words=$'FILE\nsection\nverbose'
+    elif [[ $prev2 == object ]]; then
+        words=$'section\nverbose\n'$opts
+    elif [[ $prev == pinned ]]; then
+        words="FILE"
     elif [[ $prev == addrgenmode ]]; then
         words=$'eui64\nnone\nstable_secret\nrandom'
     elif [[ $prev == vf ]]; then
