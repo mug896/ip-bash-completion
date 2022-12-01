@@ -760,7 +760,7 @@ _ip()
     trap "$extglob_reset" RETURN
     shopt -s extglob
 
-    local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 words
+    local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 sub_line words
     local cmd=$1 cmd2 cmd3 objs options help args i v
     local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
     _ip_netns_exec
