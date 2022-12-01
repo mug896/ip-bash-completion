@@ -147,7 +147,7 @@ _ip_route()
             if [[ -z ${sub_line%$cur_o} ]]; then
                 words=${type//|/$'\n'}$'\n'$prefix
                 return
-            elif [[ ${sub_line/%+( )/} == @($type) ]]; then
+            elif [[ ${sub_line/%+( )$cur_o/} == @($type) ]]; then
                 words=$prefix
                 return
             fi
