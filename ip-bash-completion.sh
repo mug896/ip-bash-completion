@@ -259,13 +259,12 @@ neigh_suppress|vlan_tunnel isolated) ]] && words=$'on\noff' ;;
 }
 _ip_link_add()
 {
-    if [[ $prev == add ]]; then
-        words=$'link\nparentdev\nname\nNAME'
-    elif [[ $prev == link ]]; then
-        words="DEV"
-    elif [[ $prev == parentdev ]]; then
-        words="NAME"
-    fi
+    case $prev in
+        add) words=$'link\nparentdev\nname\nNAME' ;;
+        link) words="DEV" ;;
+        parentdev) words="NAME" ;;
+    esac
+    [[ ${sub_line/%+( )/} == @(link|parentdev) ]] && words="name"
     [[ -n $words ]] && return
     local opts=$'txqueuelen\naddress\nbroadcast\nmtu\nindex\nnumtxqueues\nnumrxqueues\ntype'
     _ip_link_type
