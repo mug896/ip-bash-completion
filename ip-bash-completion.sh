@@ -86,7 +86,6 @@ _ip_route_info_spec()
 ssthresh\nrealms\nsrc\nrto_min\nhoplimit\ninitrwnd\nfeatures\nquickack\ncongctl\npref
 expires\nfastopen_no_cookie'
     local family='inet|inet6|mpls|bridge|link'
-    local words2
     case $prev in
         via) words=${family//|/$'\n'}$'\nADDRESS' ;;
         dev) words=$( _ip_get_data interface up ) ;;
@@ -760,7 +759,7 @@ _ip()
     trap "$extglob_reset" RETURN
     shopt -s extglob
 
-    local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 sub_line words
+    local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 sub_line words words2
     local cmd=$1 cmd2 cmd3 objs options help args i v
     local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
     _ip_netns_exec
