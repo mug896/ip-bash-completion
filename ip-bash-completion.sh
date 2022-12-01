@@ -264,7 +264,7 @@ _ip_link_add()
         link) words="DEV" ;;
         parentdev) words="NAME" ;;
     esac
-    [[ ${sub_line/%+( )/} == @(link|parentdev) ]] && words="name"
+    [[ ${sub_line/%+( )/} == @(link|parentdev)+( )+([^ ]) ]] && words="name"
     [[ -n $words ]] && return
     local opts=$'txqueuelen\naddress\nbroadcast\nmtu\nindex\nnumtxqueues\nnumrxqueues\ntype'
     _ip_link_type
