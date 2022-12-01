@@ -170,14 +170,6 @@ _ip_route()
 }
 _ip_link_type()
 {
-    local type_exist=false type_value="" type_index
-    for (( i = COMP_CWORD; i > 2; i-- )); do
-        if [[ ${COMP_WORDS[i]} == "type" ]]; then
-            type_exist=true
-            type_value=${COMP_WORDS[i+1]}
-            type_index=$(( i + 1 ))
-        fi
-    done
     if ! $type_exist; then
         words=$opts
     elif [[ $prev == "type" ]]; then
@@ -288,7 +280,7 @@ spoofchk|query_rss|trust|protodown) || $prev2 == protodown_reason ]]; then
         words=$'off\nobject\npinned'
     elif [[ $prev == object ]]; then
         words=$'FILE\nsection\nverbose'
-    elif [[ $sub_line == *" object "* && $sub_line != *" type "* ]]; then
+    elif [[ $sub_line == *" object "* ]] && ! $type_exist; then
         words=$'section\nverbose\n'$opts
     elif [[ $prev == pinned ]]; then
         words="FILE"
@@ -300,7 +292,7 @@ spoofchk|query_rss|trust|protodown) || $prev2 == protodown_reason ]]; then
         words=$'mac\nvlan\nrate\nmax_tx_rate\nmin_tx_rate\nspoofchk\nquery_rss\nstate\ntrust\nnode_guid\nport_guid'
     elif [[ $prev == proto ]]; then
         words=$'802.1Q\n802.1ad'
-    elif [[ $sub_line == *" vf "*" vlan "* && $sub_line != *" type "* ]]; then
+    elif [[ $sub_line == *" vf "*" vlan "* ]] && ! $type_exist; then
         words=$'qos\nproto\n'$opts
     elif [[ $sub_line == *" vf "*" state "$cur ]]; then
         words=$'auto\nenable\ndisable'
@@ -312,6 +304,14 @@ _ip_link()
 {
     local cmd3 cmd3_list='add|delete|set|show|xstats|afstats|property|help'
     _ip_cmd3; [[ -n $words ]] && return
+    local type_exist=false type_value="" type_index
+    for (( i = COMP_CWORD; i > 2; i-- )); do
+        if [[ ${COMP_WORDS[i]} == "type" ]]; then
+            type_exist=true
+            type_value=${COMP_WORDS[i+1]}
+            type_index=$(( i + 1 ))
+        fi
+    done
     case $cmd3 in
         add)
             _ip_link_add ;;
@@ -323,7 +323,7 @@ _ip_link()
                 dev) words=$( _ip_get_data interface ) ;;
                 group) words=$( _ip_get_data iproute2_etc group ) ;;
                 type) words=$type ;;
-                *) local opts=$'type'
+                *) local opts="type"
                     _ip_link_type
             esac ;;
         show)
