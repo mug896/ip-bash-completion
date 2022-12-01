@@ -82,7 +82,7 @@ End.DT4\nEnd.DT46\nEnd.B6\nEnd.B6.Encaps\nEnd.BM\nEnd.S\nEnd.AS\nEnd.AM\nEnd.BPF
 }
 _ip_route_info_spec()
 {
-    local opts=$'mtu\nadvmss\nas to\nrtt\nrttvar\nreordering\nwindow\ncwnd\ninitcwnd
+    opts=$'mtu\nadvmss\nas to\nrtt\nrttvar\nreordering\nwindow\ncwnd\ninitcwnd
 ssthresh\nrealms\nsrc\nrto_min\nhoplimit\ninitrwnd\nfeatures\nquickack\ncongctl\npref
 expires\nfastopen_no_cookie'
     local family='inet|inet6|mpls|bridge|link'
@@ -103,8 +103,7 @@ expires\nfastopen_no_cookie'
 }
 _ip_route() 
 {
-    local cmd3 opts
-    local cmd3_list='list|flush|save|restore|showdump|get|add|del|change|append|replace|help'
+    cmd3_list='list|flush|save|restore|showdump|get|add|del|change|append|replace|help'
     _ip_cmd3; [[ -n $words ]] && return
     local type="unicast|local|broadcast|multicast|throw|unreachable|prohibit|blackhole|nat"
     local rtproto=$'kernel\nboot\nstatic\nNUMBER'
@@ -257,8 +256,7 @@ _ip_link_add()
     esac
     [[ ${sub_line/%+( )/} == @(link|parentdev)+( )+([^ ]) ]] && words="name"
     [[ -n $words ]] && return
-    local opts=$'txqueuelen\naddress\nbroadcast\nmtu\nindex\nnumtxqueues\nnumrxqueues\ntype'
-    echo xxxxx
+    opts=$'txqueuelen\naddress\nbroadcast\nmtu\nindex\nnumtxqueues\nnumrxqueues\ntype'
     _ip_link_type
 }
 _ip_link_set()
@@ -269,7 +267,7 @@ _ip_link_set()
         group) words=$( _ip_get_data iproute2_etc group ) ;;
     esac
     [[ -n $words ]] && return
-    local opts=$'up\ndown\ntype\narp\ndynamic\nmulticast\nallmulticast\npromisc\ntrailers
+    opts=$'up\ndown\ntype\narp\ndynamic\nmulticast\nallmulticast\npromisc\ntrailers
 carrier\ntxqueuelen\nname\naddress\nbroadcast\nmtu\nnetns\nlink-netns\nlink-netnsid
 alias\nvf\nxdp\nxdpgeneric\nxdpdrv\nxdpoffload\nmaster\nvrf\nnomaster\naddrgenmode
 protodown\nprotodown_reason\ngso_max_size\ngso_max_segs'
@@ -302,7 +300,7 @@ spoofchk|query_rss|trust|protodown) || $prev2 == protodown_reason ]]; then
 }
 _ip_link()
 {
-    local cmd3 cmd3_list='add|delete|set|show|xstats|afstats|property|help'
+    cmd3_list='add|delete|set|show|xstats|afstats|property|help'
     _ip_cmd3; [[ -n $words ]] && return
     local type_exist=false type_value="" type_index
     for (( i = COMP_CWORD; i > 2; i-- )); do
@@ -323,7 +321,7 @@ _ip_link()
                 dev) words=$( _ip_get_data interface ) ;;
                 group) words=$( _ip_get_data iproute2_etc group ) ;;
                 type) words=$type ;;
-                *) local opts="type"
+                *) opts="type"
                     _ip_link_type
             esac ;;
         show)
@@ -336,7 +334,7 @@ _ip_link()
                     words+=$'\nup\nmaster\nvrf\ntype' ;;
             esac ;;
         xstats) 
-            local opts="type"
+            opts="type"
             _ip_link_type ;;
         afstats)
             case $prev in
@@ -355,7 +353,7 @@ _ip_link()
 }
 _ip_address()
 {
-    local cmd3 cmd3_list='add|change|replace|del|save|flush|show|showdump|restore|help'
+    cmd3_list='add|change|replace|del|save|flush|show|showdump|restore|help'
     _ip_cmd3; [[ -n $words ]] && return
     case $cmd3 in
         add|change|replace|del)
@@ -389,7 +387,7 @@ mngtmpaddr\nnoprefixroute\nautojoin'
 }
 _ip_addrlabel()
 {
-    local cmd3 cmd3_list='add|del|list|flush|help'
+    cmd3_list='add|del|list|flush|help'
     _ip_cmd3; [[ -n $words ]] && return
     [[ $prev == @(add|del) ]] && words="prefix"
     [[ $sub_line == "prefix "* ]] && words=$'dev\nlabel'
@@ -397,7 +395,7 @@ _ip_addrlabel()
 }
 _ip_fou()
 {
-    local cmd3 cmd3_list='add|del|show|help'
+    cmd3_list='add|del|show|help'
     _ip_cmd3; [[ -n $words ]] && return
     if [[ $prev == @(add|del) ]]; then
         words="port"
@@ -411,7 +409,7 @@ _ip_fou()
 }
 _ip_ioam()
 {
-    local cmd3 cmd3_list='namespace|schema|help'
+    cmd3_list='namespace|schema|help'
     _ip_cmd3; [[ -n $words ]] && return
     case $prev in
         namespace) words=$'show\nadd\ndel\nset' ;;
@@ -423,7 +421,7 @@ _ip_ioam()
 }
 _ip_ila()
 {
-    local cmd3 cmd3_list='add|del|list|help'
+    cmd3_list='add|del|list|help'
     _ip_cmd3; [[ -n $words ]] && return
     [[ $prev == @(add|del) ]] && words="loc_match"
     if [[ $cmd3 == add ]]; then
@@ -438,7 +436,7 @@ _ip_ila()
 }
 _ip_l2tp()
 {
-    local cmd3 cmd3_list='add|del|show|help'
+    cmd3_list='add|del|show|help'
     _ip_cmd3; [[ -n $words ]] && return
     [[ $prev == @(add|del|show) ]] && words=$'tunnel\nsession'
     if [[ $cmd3 == add && ${sub_line%% *} == tunnel ]]; then
@@ -465,7 +463,7 @@ cookie\npeer_cookie\nseq\nl2spec_type'
 }
 _ip_macsec()
 {
-    local cmd3 cmd3_list='add|set|del|show|offload|help'
+    cmd3_list='add|set|del|show|offload|help'
     _ip_cmd3; [[ -n $words ]] && return
     [[ $prev == @(${cmd3_list/help/}) ]] && words="DEV"
     if [[ $cmd3 == @(add|set|del) ]]; then
@@ -495,7 +493,7 @@ rule\nfile\nlabel\nall-nsid\ndev\nhelp'
 }
 _ip_mptcp()
 {
-    local cmd3 cmd3_list='endpoint|limits|monitor|help'
+    cmd3_list='endpoint|limits|monitor|help'
     _ip_cmd3; [[ -n $words ]] && return
     [[ $cmd3 == endpoint && $sub_line == "add "* ]] &&
         words=$'dev\nid\nport\nsignal\nsubflow\nbackup'
@@ -524,7 +522,7 @@ _ip_mrule()
 }
 _ip_neighbor()
 {
-    local cmd3 cmd3_list='add|del|change|replace|show|flush|get|help'
+    cmd3_list='add|del|change|replace|show|flush|get|help'
     _ip_cmd3; [[ -n $words ]] && return
     case $cmd3 in
         add | del | change | replace)
@@ -551,7 +549,7 @@ _ip_netconf()
 }
 _ip_netns()
 {
-    local cmd3 cmd3_list=$'list|add|attach|set|delete|identify|pids|exec|monitor|list-id|help'
+    cmd3_list=$'list|add|attach|set|delete|identify|pids|exec|monitor|list-id|help'
     _ip_cmd3; [[ -n $words ]] && return
     [[ $prev == @(add|attach|set|delete|pids|exec) ]] && words="NAME"
     [[ $prev == identify || $prev2 == attach ]] && words="PID"
@@ -592,7 +590,7 @@ _ip_netns_exec()
 }
 _ip_nexthop()
 {
-    local cmd3 cmd3_list='list|flush|add|replace|get|del|bucket|help'
+    cmd3_list='list|flush|add|replace|get|del|bucket|help'
     _ip_cmd3; [[ -n $words ]] && return
     [[ $cmd3 == @(list|flush) ]] &&
         words=$'protocol\nid\ndev\nvrf\nmaster\ngroups\nfdb'
@@ -615,7 +613,7 @@ _ip_nexthop()
 }
 _ip_ntable()
 {
-    local cmd3 cmd3_list=$'change|show|help'
+    cmd3_list=$'change|show|help'
     _ip_cmd3; [[ -n $words ]] && return
     [[ $cmd3 == show ]] && words=$'dev\nname'
     [[ $cmd3 == change ]] && words=$'dev\nthresh1\nthresh2\nthresh3\ngc_int
@@ -682,7 +680,7 @@ _ip_vrf()
 }
 _ip_xfrm()
 {
-    local cmd3 cmd3_list=$'state|policy|monitor|help'
+    cmd3_list=$'state|policy|monitor|help'
     _ip_cmd3; [[ -n $words ]] && return
 
     if [[ $cmd3 == state ]]; then
@@ -760,7 +758,7 @@ _ip()
     shopt -s extglob
 
     local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 sub_line words words2
-    local cmd=$1 cmd2 cmd3 objs options help args i v
+    local cmd=$1 cmd2 cmd3 cmd3_list objs options opts help args i v
     local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
     _ip_netns_exec
 
@@ -840,5 +838,4 @@ veth\nvlan\nvrf\nvti\nvxcan\nvxlan\nwwan\nxfrm'
 }
 
 complete -o default -o bashdefault -F _ip ip
-
 
