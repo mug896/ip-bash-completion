@@ -86,8 +86,9 @@ _ip_route_info_spec()
 ssthresh\nrealms\nsrc\nrto_min\nhoplimit\ninitrwnd\nfeatures\nquickack\ncongctl\npref
 expires\nfastopen_no_cookie'
     local family='inet|inet6|mpls|bridge|link'
+    local address=$( ip route | sed -En 's/.* via ([0-9.]*).*/\1/p' )
     case $prev in
-        via) words=${family//|/$'\n'}$'\nADDRESS' ;;
+        via) words=${family//|/$'\n'}$'\n'$address ;;
         dev) words=$( _ip_data interface up ) ;;
         weight) words="NUMBER" ;;
         nhid) words="ID" ;;
@@ -99,7 +100,7 @@ expires\nfastopen_no_cookie'
                 words+=$'\n'$words2
             fi
     esac
-    [[ $prev2 == via && $prev == @($family) ]] && words=ADDRESS
+    [[ $prev2 == via && $prev == @($family) ]] && words=$address
 }
 _ip_route() 
 {
@@ -142,11 +143,12 @@ _ip_route()
             esac
             ;;
         add | del | change | append | replace)
+            local prefix=$( ip route | cut -d ' ' -f 1 )
             if [[ -z ${sub_line%$cur_o} ]]; then
-                words=${type//|/$'\n'}$'\n'PREFIX
+                words=${type//|/$'\n'}$'\n'$prefix
                 return
             elif [[ ${sub_line/%+( )/} == @($type) ]]; then
-                words="PREFIX"
+                words=$prefix
                 return
             fi
             [[ $sub_line =~ ^((($type)[ ]+$colon|$colon)[ ]+)(.*) ]]
@@ -553,7 +555,8 @@ _ip_netns()
 {
     cmd3_list=$'list|add|attach|set|delete|identify|pids|exec|monitor|list-id|help'
     _ip_cmd3; [[ -n $words ]] && return
-    [[ $prev == @(add|attach|set|delete|pids|exec) ]] && words="NAME"
+    [[ $prev == @(set|delete|pids|exec) ]] && words=$( ip netns list )
+    [[ $prev == @(add|attach) ]] && words="NAME"
     [[ $prev == identify || $prev2 == attach ]] && words="PID"
     [[ $prev2 == set ]] && words=$'auto\nPOSITIVE-INT'
     [[ $cmd3 == list-id ]] && words=$'target-nsid\nnsid'
