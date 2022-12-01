@@ -107,7 +107,7 @@ _ip_route()
     cmd3_list='list|flush|save|restore|showdump|get|add|del|change|append|replace|help'
     _ip_cmd3; [[ -n $words ]] && return
     local type="unicast|local|broadcast|multicast|throw|unreachable|prohibit|blackhole|nat"
-    local rtproto=$'kernel\nboot\nstatic\nNUMBER'
+    local rtproto=$'kernel\nboot\nstatic\n'$( _ip_date iproute2_etc rt_protos )
     local scope=$'host\nlink\nglobal\nNUMBER'
     [[ $prev == proto ]] && { words=$rtproto; return ;}
     [[ $prev == scope ]] && { words=$scope; return ;}
@@ -359,11 +359,12 @@ _ip_address()
 {
     cmd3_list='add|change|replace|del|save|flush|show|showdump|restore|help'
     _ip_cmd3; [[ -n $words ]] && return
+    local scope=$'host\nlink\nglobal\n'$( _ip_data iproute2_etc rt_scopes )
     case $cmd3 in
         add|change|replace|del)
             [[ $sub_line != *" dev "* ]] &&
                 words=$'PREFIX\nADDR peer PREFIX\nbroadcast\nanycast\nlabel\nscope\ndev'
-            [[ $prev == scope ]] && words=$'host\nlink\nglobal\nNUMBER'
+            [[ $prev == scope ]] && words=$scope
             [[ $prev == dev ]] && words=$( _ip_data interface )
             [[ $prev == @(valid_lft|preferred_lft) ]] && words=$'forever\nSECONDS'
             if [[ -z $words ]]; then
@@ -375,7 +376,7 @@ _ip_address()
             fi ;;
         save|flush|show) 
             [[ $prev == dev ]] && words=$( _ip_data interface )
-            [[ $prev == scope ]] && words=$'host\nlink\nglobal\nNUMBER'
+            [[ $prev == scope ]] && words=$scope
             [[ $prev == type ]] && words=$type
             if [[ -z $words ]]; then 
                 if [[ $cmd3 == show ]]; then
