@@ -11,10 +11,8 @@ _init_comp_wordbreaks()
 }
 _ip_data()
 {
-    if [[ $1 == interface && $2 == up ]]; then
-        ip link show up | sed -En 's/^[0-9]+:[ ]+([^:]+).*/\1/p'
-    elif [[ $1 == interface ]]; then
-        ip link show | sed -En 's/^[0-9]+:[ ]+([^:]+).*/\1/p'
+    if [[ $1 == interface ]]; then
+        ip link show $2 | sed -En 's/^[0-9]+:[ ]+([^:]+).*/\1/p'
     elif [[ $1 == iproute2_etc ]]; then
         gawk '!/^#/{ print $2 }' /etc/iproute2/$2
     elif [[ $1 == netns ]]; then
@@ -736,10 +734,9 @@ _ip()
     trap "$extglob_reset" RETURN
     shopt -s extglob
 
-    local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
     local nsname=$( _ip_data netns ) IFS=$' \t\n' i
 
-    if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+$colon[ ]+)(.*) ]]; then
+    if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+([[:alnum:]_-]+)[ ]+)(.*) ]]; then
         COMP_LINE=${BASH_REMATCH[4]}
         let COMP_POINT-="COMP_POINT - ${#COMP_LINE}"
         COMP_LINE="ip $COMP_LINE"
@@ -810,6 +807,7 @@ _ip_main()
 -n:|-netns:|-N|-Numeric|-a|-all|-t|-timestamp|-ts|-tshort|-rc:|-rcvbuf:|-iec|\
 -br|-brief|-j|-json|-p|-pretty|-force|(-c|-color)(=(always|auto|never))?"
 
+    local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
     local regex="^$cmd[ ]+((${options//:/[ ]+$colon})[ ]+)*(${objs})[ ]+(.*)"
     if [[ $cur == -* && $comp_line2 != *" address"+( )@(save|flush|show)" "* ]]; then
         options=${options/%\(-c|-color)(=(always|auto|never))?/-c=|-color=}
