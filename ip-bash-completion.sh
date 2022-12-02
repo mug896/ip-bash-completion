@@ -735,7 +735,7 @@ _ip()
     shopt -s extglob
 
     local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
-    local nsname=$( ip netns list )
+    local nsname=$( ip netns list ) i
 
     if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+$colon[ ]+)(.*) ]]; then
         COMP_LINE=${BASH_REMATCH[4]}
