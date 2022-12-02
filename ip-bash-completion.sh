@@ -523,6 +523,7 @@ _ip_mrule()
     [[ $comp_line2 == *" "@(add|del)" "* ]] &&
         words+=$'\ntable\nprotocol\nnat\nrealms\ngoto\nsuppress_prefixlength\nsuppress_ifgroup'
     [[ $prev == table ]] && words=$'local\nmain\ndefault\nNUMBER'
+    [[ $prev == @(iif|oif) ]] && words=$( _ip_data interface up )
 
 }
 _ip_neighbor()
