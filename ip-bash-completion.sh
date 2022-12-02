@@ -778,7 +778,7 @@ _ip()
                     unset -v 'COMP_WORDS[i]'
                 done
                 if [[ $cmd == ip ]]; then
-                    _ip_main "$cmd" "$2" "$3"
+                    _ip_main "$@"
                 else
                     "$func" "$cmd" "$2" "$3"
                 fi
