@@ -16,7 +16,9 @@ _ip_data()
     elif [[ $1 == interface ]]; then
         ip link show | sed -En 's/^[0-9]+:[ ]+([^:]+).*/\1/p'
     elif [[ $1 == iproute2_etc ]]; then
-        gawk '!/^#/{print $2}' /etc/iproute2/$2
+        gawk '!/^#/{ print $2 }' /etc/iproute2/$2
+    elif [[ $1 == netns ]]; then
+        ip netns list | gawk '{ print $1 }'
     fi
 }
 _ip_cmd3()
@@ -277,7 +279,7 @@ protodown\nprotodown_reason\ngso_max_size\ngso_max_segs'
 spoofchk|query_rss|trust|protodown) || $prev2 == protodown_reason ]]; then
         words=$'on\noff'
     elif [[ $prev == netns ]]; then
-        words=$( ip netns list )$'\nPID'
+        words=$( _ip_data netns )$'\nPID'
     elif [[ $prev == @(xdp|xdpgeneric|xdpdrv|xdpoffload) ]]; then
         words=$'off\nobject\npinned'
     elif [[ $prev == object ]]; then
@@ -559,7 +561,7 @@ _ip_netns()
 {
     cmd3_list=$'list|add|attach|set|delete|identify|pids|exec|monitor|list-id|help'
     _ip_cmd3; [[ -n $words ]] && return
-    [[ $prev == @(set|delete|pids|exec) ]] && words=$( ip netns list )
+    [[ $prev == @(set|delete|pids|exec) ]] && words=$( _ip_data netns )
     [[ $prev == @(add|attach) ]] && words="NAME"
     [[ $prev == identify || $prev2 == attach ]] && words="PID"
     [[ $prev2 == set ]] && words=$'auto\nPOSITIVE-INT'
@@ -735,7 +737,7 @@ _ip()
     shopt -s extglob
 
     local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
-    local nsname=$( ip netns list ) IFS=$' \t\n' i
+    local nsname=$( _ip_data netns ) IFS=$' \t\n' i
 
     if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+$colon[ ]+)(.*) ]]; then
         COMP_LINE=${BASH_REMATCH[4]}
@@ -756,7 +758,7 @@ _ip()
     elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)((${nsname//$'\n'/|})[ ]+)?(.*) ]]; then
         local cmd func arr tmp_line=${BASH_REMATCH[6]} 
         if [[ -z ${tmp_line%${COMP_WORDS[COMP_CWORD]}} ]]; then
-            local words=$(compgen -c)$'\n'$(ip netns list)
+            local words=$(compgen -c)$'\n'$( _ip_data netns )
             COMPREPLY=($(compgen -W "$words" -- "${COMP_WORDS[COMP_CWORD]}"))
             return
         fi
@@ -819,7 +821,7 @@ _ip_main()
     elif [[ $prev == @(-f|-family) ]]; then
         words=$'inet\ninet6\nbridge\nmpls\nlink'
     elif [[ $prev == @(-n|-netns) ]]; then
-        words=$( ip netns list )
+        words=$( _ip_data netns )
         [[ -z $words ]] && words="NETNS"
     elif [[ $prev == @(-rc|-rcvbuf) ]]; then
         words="SIZE"
