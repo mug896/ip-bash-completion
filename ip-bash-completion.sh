@@ -764,7 +764,7 @@ _ip()
     elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)((${nsname//$'\n'/|})[ ]+)?(.*) ]]; then
         local cmd func arr tmp_line=${BASH_REMATCH[6]} 
         if [[ -z ${tmp_line%$cur} ]]; then
-            local words=$(compgen -c)$'\n'$(ip netns list)
+            words=$(compgen -c)$'\n'$(ip netns list)
             COMPREPLY=($(compgen -W "$words" -- "$cur"))
             return
         fi
