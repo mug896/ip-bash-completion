@@ -736,7 +736,6 @@ _ip()
 
     local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
     local nsname=$( ip netns list ) IFS=$' \t\n'
-    [[ -n $nsname ]] && nsname="${nsname//$'\n'/|}[ ]+"
 
     if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+$colon[ ]+)(.*) ]]; then
         COMP_LINE=${BASH_REMATCH[4]}
@@ -754,10 +753,11 @@ _ip()
         done
         _ip_main "$@"
 
-    elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)($nsname)?(.*) ]]; then
-        local cmd func arr i tmp_line=${BASH_REMATCH[5]} 
-        if [[ -z ${tmp_line%$2} ]]; then
-            COMPREPLY=($(compgen -c -- "$2"))
+    elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)((${nsname//$'\n'/|})[ ]+)?(.*) ]]; then
+        local cmd func arr i tmp_line=${BASH_REMATCH[6]} 
+        if [[ -z ${tmp_line%${COMP_WORDS[COMP_CWORD]}} ]]; then
+            local words=$(compgen -c)$'\n'$(ip netns list)
+            COMPREPLY=($(compgen -W "$words" -- "${COMP_WORDS[COMP_CWORD]}"))
             return
         fi
         cmd=${tmp_line%% *}
