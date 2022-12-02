@@ -792,7 +792,7 @@ _ip_main()
     local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 sub_line words words2
     local cmd=$1 cmd2 cmd3 cmd3_list objs options opts help args i v
     local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
-    _ip_netns_exec; [[ -n $COMPREPLY ]] && return
+    _ip_netns_exec
 
     cur=${COMP_WORDS[COMP_CWORD]} cur_o=$cur
     comp_line2=${COMP_LINE:0:$COMP_POINT}
