@@ -725,9 +725,16 @@ byte-soft\nbyte-hard\npacket-soft\npacket-hard' ;;
 }
 _ip()
 {
+    _init_comp_wordbreaks
+    COMP_WORDBREAKS=${COMP_WORDBREAKS//:/}
+
+    local extglob_reset=$(shopt -p extglob)
+    trap "$extglob_reset" RETURN
+    shopt -s extglob
+
+    local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
     local nsname=$( ip netns list ) IFS=$' \t\n'
     [[ -n $nsname ]] && nsname="${nsname//$'\n'/|}[ ]+"
-    local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
 
     if [[ $COMP_LINE =~ ^(.*[ ]+(-n|-netns)[ ]+$colon[ ]+)(.*) ]]; then
         COMP_LINE=${BASH_REMATCH[4]}
@@ -783,13 +790,6 @@ _ip()
 }
 _ip_main()
 {
-    _init_comp_wordbreaks
-    COMP_WORDBREAKS=${COMP_WORDBREAKS//:/}
-
-    local extglob_reset=$(shopt -p extglob)
-    trap "$extglob_reset" RETURN
-    shopt -s extglob
-
     local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 sub_line words words2
     local cmd=$1 cmd2 cmd3 cmd3_list objs options opts help args i v
 
