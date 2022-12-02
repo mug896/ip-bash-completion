@@ -266,7 +266,7 @@ _ip_link_set()
     case $prev in
         set) words=$( _ip_data interface )$'\ndev\ngroup' ;;
         dev) words=$( _ip_data interface ) ;;
-        group) words=$( _ip_data iproute2_etc group ) ;;
+        group) words="DEVGROUP" ;;
     esac
     [[ -n $words ]] && return
     opts=$'up\ndown\ntype\narp\ndynamic\nmulticast\nallmulticast\npromisc\ntrailers
@@ -323,7 +323,7 @@ _ip_link()
             case $prev in
                 $cmd3) words=$( _ip_data interface )$'\ndev\ngroup' ;;
                 dev) words=$( _ip_data interface ) ;;
-                group) words=$( _ip_data iproute2_etc group ) ;;
+                group) words="DEVGROUP" ;;
                 type) words=$type ;;
                 *) opts="type"
                     _ip_link_type
@@ -578,20 +578,6 @@ _ip_netns_exec()
             fi
             unset -v 'COMP_WORDS[i]'
         done
-    elif [[ $COMP_LINE =~ ^(.*[ ]+netns[ ]+exec[ ]+$colon[ ]+ip[ ]+)(.*) ]]; then
-        COMP_LINE=${BASH_REMATCH[3]}
-        let COMP_POINT-="COMP_POINT - ${#COMP_LINE}"
-        COMP_LINE="ip $COMP_LINE"
-        let COMP_POINT+=3
-        for (( i = 0; i < ${#COMP_WORDS[@]}; i++ )); do
-            if [[ ${COMP_WORDS[i]} == ip ]]; then
-                unset -v 'COMP_WORDS[i]'
-                COMP_WORDS=( "ip" "${COMP_WORDS[@]}" )
-                let COMP_CWORD-=i
-                break
-            fi
-            unset -v 'COMP_WORDS[i]'
-        done
     fi
 }
 _ip_nexthop()
@@ -756,6 +742,46 @@ byte-soft\nbyte-hard\npacket-soft\npacket-hard' ;;
 }
 _ip()
 {
+    local nsname=$( ip netns list ) IFS=$' \t\n'
+    [[ -n $nsname ]] && nsname="${nsname//$'\n'/|}[ ]+"
+    if [[ $COMP_LINE =~ ^(.*[ ]+netns[ ]+exec[ ]+)($nsname)?(.*) ]]; then
+        local cmd func arr i tmp_line=${BASH_REMATCH[3]} 
+        if [[ -z ${tmp_line%$2} ]]; then
+            IFS=$'\n' COMPREPLY=($(compgen -c -- "$2"))
+            return
+        fi
+        cmd=${tmp_line%% *}
+        if ! complete -p "$cmd" &> /dev/null; then
+            _completion_loader "$cmd" &> /dev/null
+        fi
+        if arr=($(complete -p "$cmd" 2> /dev/null)); then
+            for (( i = 1; i < ${#arr[@]}; i++ )); do 
+                [[ ${arr[i]} == -F ]] && { func=${arr[i + 1]}; break ;}
+            done
+            if [[ -n $func ]]; then 
+                COMP_LINE=$tmp_line
+                let COMP_POINT-="COMP_POINT - ${#COMP_LINE}"
+                for (( i = 0; i < $COMP_CWORD; i++ )); do
+                    if [[ ${COMP_WORDS[i]} == $cmd ]]; then
+                        COMP_WORDS=( "${COMP_WORDS[@]}" )
+                        let COMP_CWORD-=i
+                        break
+                    fi
+                    unset -v 'COMP_WORDS[i]'
+                done
+                if [[ $cmd == ip ]]; then
+                    _ip_main "$cmd" "$2" "$3"
+                else
+                    "$func" "$cmd" "$2" "$3"
+                fi
+            fi
+        fi
+    else
+        _ip_main "$@"
+    fi
+}
+_ip_main()
+{
     _init_comp_wordbreaks
     COMP_WORDBREAKS=${COMP_WORDBREAKS//:/}
 
@@ -766,7 +792,7 @@ _ip()
     local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 sub_line words words2
     local cmd=$1 cmd2 cmd3 cmd3_list objs options opts help args i v
     local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
-    _ip_netns_exec
+    _ip_netns_exec; [[ -n $COMPREPLY ]] && return
 
     cur=${COMP_WORDS[COMP_CWORD]} cur_o=$cur
     comp_line2=${COMP_LINE:0:$COMP_POINT}
@@ -792,7 +818,8 @@ _ip()
     elif [[ $prev == @(-f|-family) ]]; then
         words=$'inet\ninet6\nbridge\nmpls\nlink'
     elif [[ $prev == @(-n|-netns) ]]; then
-        words="NETNS"
+        words=$( ip netns list )
+        [[ -z $words ]] && words="NETNS"
     elif [[ $prev == @(-rc|-rcvbuf) ]]; then
         words="SIZE"
     elif [[ $prev == @(-c|-color) ]]; then
