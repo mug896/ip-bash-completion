@@ -754,8 +754,8 @@ _ip()
         done
         _ip_main "$@"
 
-    elif [[ $COMP_LINE =~ ^(ip[ ]+(-all[ ]+)?netns[ ]+exec[ ]+)($nsname)?(.*) ]]; then
-        local cmd func arr i tmp_line=${BASH_REMATCH[4]} 
+    elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)($nsname)?(.*) ]]; then
+        local cmd func arr i tmp_line=${BASH_REMATCH[5]} 
         if [[ -z ${tmp_line%$2} ]]; then
             COMPREPLY=($(compgen -c -- "$2"))
             return
