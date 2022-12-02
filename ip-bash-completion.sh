@@ -747,7 +747,7 @@ _ip()
     if [[ $COMP_LINE =~ ^(.*[ ]+netns[ ]+exec[ ]+)($nsname)?(.*) ]]; then
         local cmd func arr i tmp_line=${BASH_REMATCH[3]} 
         if [[ -z ${tmp_line%$2} ]]; then
-            IFS=$'\n' COMPREPLY=($(compgen -c -- "$2"))
+            COMPREPLY=($(compgen -c -- "$2"))
             return
         fi
         cmd=${tmp_line%% *}
