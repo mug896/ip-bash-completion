@@ -404,6 +404,8 @@ _ip_fou()
     _ip_cmd3; [[ -n $words ]] && return
     if [[ $prev == @(add|del) ]]; then
         words="port"
+    elif [[ $prev == port ]]; then
+        words="PORT"
     elif [[ $cmd3 == @(add|del) ]]; then
         if [[ $cmd3 == add && $prev2 == port ]]; then
             words=$'ipproto\ngue'
