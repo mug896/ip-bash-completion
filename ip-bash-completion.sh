@@ -107,7 +107,7 @@ _ip_route()
     cmd3_list='list|flush|save|restore|showdump|get|add|del|change|append|replace|help'
     _ip_cmd3; [[ -n $words ]] && return
     local type="unicast|local|broadcast|multicast|throw|unreachable|prohibit|blackhole|nat"
-    local rtproto=$'kernel\nboot\nstatic\n'$( _ip_date iproute2_etc rt_protos )
+    local rtproto=$'kernel\nboot\nstatic\n'$( _ip_data iproute2_etc rt_protos )
     local scope=$'host\nlink\nglobal\nNUMBER'
     [[ $prev == proto ]] && { words=$rtproto; return ;}
     [[ $prev == scope ]] && { words=$scope; return ;}
