@@ -563,24 +563,6 @@ _ip_netns()
     [[ $prev2 == set ]] && words=$'auto\nPOSITIVE-INT'
     [[ $cmd3 == list-id ]] && words=$'target-nsid\nnsid'
 }
-_ip_netns_exec()
-{
-    if [[ $COMP_LINE =~ ^(.*[ ]+(-n|-netns)[ ]+$colon[ ]+)(.*) ]]; then
-        COMP_LINE=${BASH_REMATCH[4]}
-        let COMP_POINT-="COMP_POINT - ${#COMP_LINE}"
-        COMP_LINE="ip $COMP_LINE"
-        let COMP_POINT+=3
-        for (( i = 0; i < ${#COMP_WORDS[@]}; i++ )); do
-            if [[ ${COMP_WORDS[i]} == @(-n|-netns) ]]; then
-                unset -v 'COMP_WORDS[i]' 'COMP_WORDS[i+1]'
-                COMP_WORDS=( "ip" "${COMP_WORDS[@]}" )
-                let COMP_CWORD-=i+1
-                break
-            fi
-            unset -v 'COMP_WORDS[i]'
-        done
-    fi
-}
 _ip_nexthop()
 {
     cmd3_list='list|flush|add|replace|get|del|bucket|help'
@@ -745,7 +727,25 @@ _ip()
 {
     local nsname=$( ip netns list ) IFS=$' \t\n'
     [[ -n $nsname ]] && nsname="${nsname//$'\n'/|}[ ]+"
-    if [[ $COMP_LINE =~ ^(.*[ ]+netns[ ]+exec[ ]+)($nsname)?(.*) ]]; then
+    local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
+
+    if [[ $COMP_LINE =~ ^(.*[ ]+(-n|-netns)[ ]+$colon[ ]+)(.*) ]]; then
+        COMP_LINE=${BASH_REMATCH[4]}
+        let COMP_POINT-="COMP_POINT - ${#COMP_LINE}"
+        COMP_LINE="ip $COMP_LINE"
+        let COMP_POINT+=3
+        for (( i = 0; i < ${#COMP_WORDS[@]}; i++ )); do
+            if [[ ${COMP_WORDS[i]} == @(-n|-netns) ]]; then
+                unset -v 'COMP_WORDS[i]' 'COMP_WORDS[i+1]'
+                COMP_WORDS=( "ip" "${COMP_WORDS[@]}" )
+                let COMP_CWORD-=i+1
+                break
+            fi
+            unset -v 'COMP_WORDS[i]'
+        done
+        _ip_main "$@"
+
+    elif [[ $COMP_LINE =~ ^(.*[ ]+netns[ ]+exec[ ]+)($nsname)?(.*) ]]; then
         local cmd func arr i tmp_line=${BASH_REMATCH[3]} 
         if [[ -z ${tmp_line%$2} ]]; then
             COMPREPLY=($(compgen -c -- "$2"))
@@ -792,8 +792,6 @@ _ip_main()
 
     local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 sub_line words words2
     local cmd=$1 cmd2 cmd3 cmd3_list objs options opts help args i v
-    local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
-    _ip_netns_exec
 
     cur=${COMP_WORDS[COMP_CWORD]} cur_o=$cur
     comp_line2=${COMP_LINE:0:$COMP_POINT}
