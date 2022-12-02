@@ -738,7 +738,7 @@ _ip()
     local nsname=$( ip netns list ) IFS=$' \t\n'
     [[ -n $nsname ]] && nsname="${nsname//$'\n'/|}[ ]+"
 
-    if [[ $COMP_LINE =~ ^(.*[ ]+(-n|-netns)[ ]+$colon[ ]+)(.*) ]]; then
+    if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+$colon[ ]+)(.*) ]]; then
         COMP_LINE=${BASH_REMATCH[4]}
         let COMP_POINT-="COMP_POINT - ${#COMP_LINE}"
         COMP_LINE="ip $COMP_LINE"
@@ -754,8 +754,8 @@ _ip()
         done
         _ip_main "$@"
 
-    elif [[ $COMP_LINE =~ ^(.*[ ]+netns[ ]+exec[ ]+)($nsname)?(.*) ]]; then
-        local cmd func arr i tmp_line=${BASH_REMATCH[3]} 
+    elif [[ $COMP_LINE =~ ^(ip[ ]+(-all[ ]+)?netns[ ]+exec[ ]+)($nsname)?(.*) ]]; then
+        local cmd func arr i tmp_line=${BASH_REMATCH[4]} 
         if [[ -z ${tmp_line%$2} ]]; then
             COMPREPLY=($(compgen -c -- "$2"))
             return
