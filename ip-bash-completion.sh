@@ -809,7 +809,7 @@ _ip_main()
 -br|-brief|-j|-json|-p|-pretty|-force|(-c|-color)(=(always|auto|never))?"
 
     local regex="^$cmd[ ]+((${options//:/[ ]+$colon})[ ]+)*(${objs})[ ]+(.*)"
-    if [[ $cur == -* && $comp_line2 != *" address "@(save|flush|show)" "* ]]; then
+    if [[ $cur == -* && $comp_line2 != *" address"+( )@(save|flush|show)" "* ]]; then
         options=${options/%\(-c|-color)(=(always|auto|never))?/-c=|-color=}
         words=${options//?(:)|/$'\n'}
     elif [[ $prev == @(-b|-batch) ]]; then
