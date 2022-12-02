@@ -734,14 +734,6 @@ _ip()
     trap "$extglob_reset" RETURN
     shopt -s extglob
 
-    local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 words help args i v
-    cur=${COMP_WORDS[COMP_CWORD]} cur_o=$cur
-    comp_line2=${COMP_LINE:0:$COMP_POINT}
-    [[ ${comp_line2: -1} = " " || $COMP_WORDBREAKS == *$cur* ]] && cur=""
-    prev=${COMP_WORDS[COMP_CWORD-1]} prev_o=$prev
-    [[ $prev == [,=] ]] && prev=${COMP_WORDS[COMP_CWORD-2]}
-    prev2=${COMP_WORDS[COMP_CWORD-2]}
-
     local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
     local nsname=$( ip netns list )
 
@@ -763,9 +755,9 @@ _ip()
 
     elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)((${nsname//$'\n'/|})[ ]+)?(.*) ]]; then
         local cmd func arr tmp_line=${BASH_REMATCH[6]} 
-        if [[ -z ${tmp_line%$cur} ]]; then
-            words=$(compgen -c)$'\n'$(ip netns list)
-            COMPREPLY=($(compgen -W "$words" -- "$cur"))
+        if [[ -z ${tmp_line%${COMP_WORDS[COMP_CWORD]}} ]]; then
+            local words=$(compgen -c)$'\n'$(ip netns list)
+            COMPREPLY=($(compgen -W "$words" -- "${COMP_WORDS[COMP_CWORD]}"))
             return
         fi
         cmd=${tmp_line%% *}
@@ -780,7 +772,7 @@ _ip()
                 COMP_LINE=$tmp_line
                 let COMP_POINT-="COMP_POINT - ${#COMP_LINE}"
                 for (( i = 0; i < $COMP_CWORD; i++ )); do
-                    if [[ ${COMP_WORDS[i]} == $cmd ]]; then
+                    if [[ $i -ne 0 && ${COMP_WORDS[i]} == $cmd ]]; then
                         COMP_WORDS=( "${COMP_WORDS[@]}" )
                         let COMP_CWORD-=i
                         break
@@ -800,7 +792,16 @@ _ip()
 }
 _ip_main()
 {
+    local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 words help args i v
     local cmd=$1 cmd2 cmd3 cmd3_list objs options opts sub_line words2
+
+    cur=${COMP_WORDS[COMP_CWORD]} cur_o=$cur
+    comp_line2=${COMP_LINE:0:$COMP_POINT}
+    [[ ${comp_line2: -1} = " " || $COMP_WORDBREAKS == *$cur* ]] && cur=""
+    prev=${COMP_WORDS[COMP_CWORD-1]} prev_o=$prev
+    [[ $prev == [,=] ]] && prev=${COMP_WORDS[COMP_CWORD-2]}
+    prev2=${COMP_WORDS[COMP_CWORD-2]}
+
     objs=$( $cmd -h |& sed -Ez 's/.*OBJECT := \{([^}]+)}.*/\1/; s/[ \t\n]+//g;' )
     options="-V|-Version|-h|-human|-human-readable|-b:|-batch:|-s|-stats|-statistics|\
 -d|-details|-l:|-loops:|-f:|-family:|-4|-6|-B|-M|-0|-o|-oneline|-r|-resolve|\
