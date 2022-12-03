@@ -524,9 +524,9 @@ _ip_mrule()
 {
     [[ $prev != @(flush|save|restore) ]] &&
         words=$'add\ndel\nflush\nsave\nrestore\nlist\nhelp'
-    [[ $comp_line2 == *" "@(add|del|list)" "* ]] &&
+    [[ $COMP_LINE == *" "@(add|del|list)" "* ]] &&
         words=$'not\nfrom\nto\ntos\nfwmark\niif\noif\npref\nl3mdev\nuidrange\nipproto\nsport\ndport'
-    [[ $comp_line2 == *" "@(add|del)" "* ]] &&
+    [[ $COMP_LINE == *" "@(add|del)" "* ]] &&
         words+=$'\ntable\nprotocol\nnat\nrealms\ngoto\nsuppress_prefixlength\nsuppress_ifgroup'
     [[ $prev == table ]] && words=$'local\nmain\ndefault\nNUMBER'
     [[ $prev == @(iif|oif) ]] && words=$( _ip_data interface up )
@@ -739,14 +739,13 @@ _ip()
     shopt -s extglob
 
     local nsname IFS=$' \t\n' i
+    COMP_LINE=${COMP_LINE:0:$COMP_POINT}
 
     if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+([[:alnum:]_-]+)[ ]+)(.*) ]]; then
         nsname=${BASH_REMATCH[3]}
-        COMP_LINE=${BASH_REMATCH[4]}
-        let COMP_POINT-="COMP_POINT - ${#COMP_LINE}"
-        COMP_LINE="ip $COMP_LINE"
-        let COMP_POINT+=3
-        for (( i = 0; i < ${#COMP_WORDS[@]}; i++ )); do
+        COMP_LINE="ip ${BASH_REMATCH[4]}"
+        COMP_POINT=${#COMP_LINE}
+        for (( i = 0; i <= $COMP_CWORD; i++ )); do
             if [[ ${COMP_WORDS[i]} == @(-n|-netns) ]]; then
                 unset -v 'COMP_WORDS[i]' 'COMP_WORDS[i+1]'
                 COMP_WORDS=( "ip" "${COMP_WORDS[@]}" )
@@ -767,9 +766,11 @@ _ip()
             nsname=${BASH_REMATCH[2]}
             tmp_line=${BASH_REMATCH[3]}
         fi
-        if [[ -z ${tmp_line%${COMP_WORDS[COMP_CWORD]}} ]]; then
+        local cur=${COMP_WORDS[COMP_CWORD]}
+        [[ ${COMP_LINE: -1} = " " ]] && cur=""
+        if [[ -z ${tmp_line%$cur} ]]; then
             local words=$(compgen -c)
-            COMPREPLY=($(compgen -W "$words" -- "${COMP_WORDS[COMP_CWORD]}"))
+            COMPREPLY=($(compgen -W "$words" -- "$cur"))
             return
         fi
         cmd=${tmp_line%% *}
@@ -782,7 +783,7 @@ _ip()
             done
             if [[ -n $func ]]; then 
                 COMP_LINE=$tmp_line
-                let COMP_POINT-="COMP_POINT - ${#COMP_LINE}"
+                COMP_POINT=${#COMP_LINE}
                 for (( i = 0; i < $COMP_CWORD; i++ )); do
                     if [[ $i -ne 0 && ${COMP_WORDS[i]} == $cmd ]]; then
                         COMP_WORDS=( "${COMP_WORDS[@]}" )
@@ -804,12 +805,12 @@ _ip()
 }
 _ip_main()
 {
-    local IFS=$' \t\n' cur cur_o prev prev_o prev2 comp_line2 words help args i v
+    local IFS=$' \t\n' cur cur_o prev prev_o prev2 words help args i v
     local cmd=$1 cmd2 cmd3 cmd3_list objs options opts sub_line words2
 
+    COMP_LINE=${COMP_LINE:0:$COMP_POINT}
     cur=${COMP_WORDS[COMP_CWORD]} cur_o=$cur
-    comp_line2=${COMP_LINE:0:$COMP_POINT}
-    [[ ${comp_line2: -1} = " " || $COMP_WORDBREAKS == *$cur* ]] && cur=""
+    [[ ${COMP_LINE: -1} = " " || $COMP_WORDBREAKS == *$cur* ]] && cur=""
     prev=${COMP_WORDS[COMP_CWORD-1]} prev_o=$prev
     [[ $prev == [,=] ]] && prev=${COMP_WORDS[COMP_CWORD-2]}
     prev2=${COMP_WORDS[COMP_CWORD-2]}
@@ -822,7 +823,7 @@ _ip_main()
 
     local colon="(\\\\\ |[^ ]|[\"'][^\"']*[\"'])+"
     local regex="^$cmd[ ]+((${options//:/[ ]+$colon})[ ]+)*(${objs})[ ]+(.*)"
-    if [[ $cur == -* && $comp_line2 != *" address"+( )@(save|flush|show)" "* ]]; then
+    if [[ $cur == -* && $COMP_LINE != *" address"+( )@(save|flush|show)" "* ]]; then
         options=${options/%\(-c|-color)(=(always|auto|never))?/-c=|-color=}
         words=${options//?(:)|/$'\n'}
     elif [[ $prev == @(-b|-batch) ]]; then
@@ -838,7 +839,7 @@ _ip_main()
         words="SIZE"
     elif [[ $prev == @(-c|-color) ]]; then
         words=$'always\nauto\nnever'
-    elif ! [[ $comp_line2 =~ $regex ]]; then
+    elif ! [[ $COMP_LINE =~ $regex ]]; then
         words=${objs//|/$'\n'}
     else
         cmd2=${BASH_REMATCH[ ${#BASH_REMATCH[@]} - 2 ]}
