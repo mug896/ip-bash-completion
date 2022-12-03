@@ -12,7 +12,11 @@ _init_comp_wordbreaks()
 _ip_data()
 {
     if [[ $1 == interface ]]; then
-        ip link show $2 | sed -En 's/^[0-9]+:[ ]+([^:]+).*/\1/p'
+        if [[ -n $nsname ]]; then
+            sudo ip -n $nsname link show $2 | sed -En 's/^[0-9]+:[ ]+([^@:]+).*/\1/p'
+        else
+            ip link show $2 | sed -En 's/^[0-9]+:[ ]+([^@:]+).*/\1/p'
+        fi
     elif [[ $1 == iproute2_etc ]]; then
         gawk '!/^#/{ print $2 }' /etc/iproute2/$2
     elif [[ $1 == netns ]]; then
@@ -737,6 +741,7 @@ _ip()
     local nsname=$( _ip_data netns ) IFS=$' \t\n' i
 
     if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+([[:alnum:]_-]+)[ ]+)(.*) ]]; then
+        nsname=${BASH_REMATCH[3]}
         COMP_LINE=${BASH_REMATCH[4]}
         let COMP_POINT-="COMP_POINT - ${#COMP_LINE}"
         COMP_LINE="ip $COMP_LINE"
@@ -753,6 +758,7 @@ _ip()
         _ip_main "$@"
 
     elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)((${nsname//$'\n'/|})[ ]+)?(.*) ]]; then
+        nsname=${BASH_REMATCH[5]}
         local cmd func arr tmp_line=${BASH_REMATCH[6]} 
         if [[ -z ${tmp_line%${COMP_WORDS[COMP_CWORD]}} ]]; then
             local words=$(compgen -c)$'\n'$( _ip_data netns )
