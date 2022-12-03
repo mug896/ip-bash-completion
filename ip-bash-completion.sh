@@ -738,7 +738,7 @@ _ip()
     trap "$extglob_reset" RETURN
     shopt -s extglob
 
-    local nsname=$( _ip_data netns ) IFS=$' \t\n' i
+    local nsname IFS=$' \t\n' i
 
     if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+([[:alnum:]_-]+)[ ]+)(.*) ]]; then
         nsname=${BASH_REMATCH[3]}
@@ -759,8 +759,7 @@ _ip()
 
     elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)(.*) ]]; then
         local cmd func arr tmp_line=${BASH_REMATCH[4]} 
-        if [[ ${BASH_REMATCH[3]} == @(-a|-all) ]]; then nsname=""
-        else
+        if [[ ${BASH_REMATCH[3]} != @(-a|-all) ]]; then
             if ! [[ $tmp_line =~ ^(([[:alnum:]_-]+)[ ]+)(.*) ]]; then
                 _ip_main "$@"
                 return
