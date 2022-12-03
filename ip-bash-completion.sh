@@ -745,7 +745,7 @@ _ip()
         nsname=${BASH_REMATCH[3]}
         COMP_LINE="ip ${BASH_REMATCH[4]}"
         COMP_POINT=${#COMP_LINE}
-        for (( i = 0; i <= $COMP_CWORD; i++ )); do
+        for (( i = 0; i < $COMP_CWORD; i++ )); do
             if [[ ${COMP_WORDS[i]} == @(-n|-netns) ]]; then
                 unset -v 'COMP_WORDS[i]' 'COMP_WORDS[i+1]'
                 COMP_WORDS=( "ip" "${COMP_WORDS[@]}" )
