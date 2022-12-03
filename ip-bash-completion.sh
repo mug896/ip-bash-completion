@@ -13,9 +13,18 @@ _ip_data()
 {
     if [[ $1 == interface ]]; then
         if [[ -n $nsname ]]; then
-            sudo ip -n $nsname link show $2 | sed -En 's/^[0-9]+:[ ]+([^@:]+).*/\1/p'
+            sudo ip -n $nsname link show $2
         else
-            ip link show $2 | sed -En 's/^[0-9]+:[ ]+([^@:]+).*/\1/p'
+            ip link show $2 
+        fi | sed -En 's/^[0-9]+:[ ]+([^@:]+).*/\1/p'
+    elif [[ $1 == route ]]; then
+        local command
+        [[ -n $nsname ]] && command="sudo ip -n $nsname route" || 
+                            command="ip route"
+        if [[ $2 == default ]]; then
+            $command | sed -En 's/.* via ([0-9.]*).*/\1/p'
+        else
+            $command | gawk '{ print $1 }'; echo default
         fi
     elif [[ $1 == iproute2_etc ]]; then
         gawk '!/^#/{ print $2 }' /etc/iproute2/$2
@@ -90,7 +99,7 @@ _ip_route_info_spec()
 ssthresh\nrealms\nsrc\nrto_min\nhoplimit\ninitrwnd\nfeatures\nquickack\ncongctl\npref
 expires\nfastopen_no_cookie'
     local family='inet|inet6|mpls|bridge|link'
-    local address=$( ip route | sed -En 's/.* via ([0-9.]*).*/\1/p' )
+    local address=$( _ip_data route default )
     case $prev in
         via) words=${family//|/$'\n'}$'\n'$address ;;
         dev) words=$( _ip_data interface up ) ;;
@@ -147,7 +156,7 @@ _ip_route()
             esac
             ;;
         add | del | change | append | replace)
-            local prefix=$( ip route | gawk '{ print $1 }' )
+            local prefix=$( _ip_data route )
             if [[ -z ${sub_line%$cur_o} ]]; then
                 words=${type//|/$'\n'}$'\n'$prefix
                 return
