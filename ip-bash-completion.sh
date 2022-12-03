@@ -269,7 +269,7 @@ _ip_link_set()
 {
     case $prev in
         set) words=$( _ip_data interface )$'\ndev\ngroup' ;;
-        dev) words=$( _ip_data interface ) ;;
+        dev|master) words=$( _ip_data interface ) ;;
         group) words="DEVGROUP" ;;
     esac
     [[ -n $words ]] && return
