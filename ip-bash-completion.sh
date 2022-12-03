@@ -738,7 +738,7 @@ _ip()
     trap "$extglob_reset" RETURN
     shopt -s extglob
 
-    local nsname=$( _ip_data netns ) IFS=$' \t\n' i
+    local nsname=$( _ip_data netns ) nsname_all IFS=$' \t\n' i
 
     if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+([[:alnum:]_-]+)[ ]+)(.*) ]]; then
         nsname=${BASH_REMATCH[3]}
@@ -757,11 +757,17 @@ _ip()
         done
         _ip_main "$@"
 
-    elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)((${nsname//$'\n'/|})[ ]+)?(.*) ]]; then
-        nsname=${BASH_REMATCH[5]}
-        local cmd func arr tmp_line=${BASH_REMATCH[6]} 
+    elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)(.*) ]]; then
+        [[ -n ${BASH_REMATCH[3]} ]] && nsname_all=true || nsname_all=false
+        local cmd func arr tmp_line=${BASH_REMATCH[4]} 
+        if $nsname_all; then nsname=""
+        else
+            ! [[ $tmp_line =~ ^(([[:alnum:]_-]+)[ ]+)(.*) ]] && { _ip_main "$@"; return ;}
+            nsname=${BASH_REMATCH[2]}
+            tmp_line=${BASH_REMATCH[3]}
+        fi
         if [[ -z ${tmp_line%${COMP_WORDS[COMP_CWORD]}} ]]; then
-            local words=$(compgen -c)$'\n'$( _ip_data netns )
+            local words=$(compgen -c)
             COMPREPLY=($(compgen -W "$words" -- "${COMP_WORDS[COMP_CWORD]}"))
             return
         fi
