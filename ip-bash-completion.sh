@@ -29,7 +29,8 @@ _ip_data()
     elif [[ $1 == iproute2_etc ]]; then
         gawk '!/^#/{ print $2 }' /etc/iproute2/$2
     elif [[ $1 == netns ]]; then
-        ip netns list | gawk '{ print $1 }'
+        ip netns list | gawk '{ res = res "\n" $1 } END { 
+            if (res ~ /[[:alpha:]]/) { print res } else { print "NAME" } }'
     fi
 }
 _ip_cmd3()
