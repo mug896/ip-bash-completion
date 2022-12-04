@@ -779,8 +779,7 @@ _ip()
         local cur=${COMP_WORDS[COMP_CWORD]}
         [[ ${COMP_LINE: -1} = " " ]] && cur=""
         if [[ -z ${tmp_line%$cur} ]]; then
-            local words=$(compgen -c)
-            COMPREPLY=($(compgen -W "$words" -- "$cur"))
+            COMPREPLY=($(compgen -A command -- "$cur"))
             return
         fi
         cmd=${tmp_line%% *}
