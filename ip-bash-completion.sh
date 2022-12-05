@@ -190,7 +190,7 @@ _ip_link_type()
         words=$type
     else
         words=$( ip link help $type_value |
-            sed -En '1,/^$/{ 1{s/^.*'"$type_value"'//}; s/[{<][^}>]*[}>]//g; s/([][a-z|_-]{2,})|./\1\n/g; p}' |
+            sed -En '1,/^$/{ 1{s/^.*'"$type_value"'//}; s/[{<][^}>]*[}>]//g; s/([][a-z0-9|_-]{2,})|./\1\n/g; p}' |
             sed -E 's/(.*)\[no](.*)/\1\2\n\1no\2/' |
             sed -E 's/(.*)\[i\|o](.*)/\1\2\n\1i\2\n\1o\2/; s/[][|]/\n/g' )
         case $type_value in
