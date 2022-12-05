@@ -825,6 +825,7 @@ _ip_main()
     prev2=${COMP_WORDS[COMP_CWORD-2]}
 
     objs=$( $cmd -h |& sed -Ez 's/.*OBJECT := \{([^}]+)}.*/\1/; s/[ \t\n]+//g;' )
+    objs+=$'\naddr\nmaddr'
     options="-V|-Version|-h|-human|-human-readable|-b:|-batch:|-s|-stats|-statistics|\
 -d|-details|-l:|-loops:|-f:|-family:|-4|-6|-B|-M|-0|-o|-oneline|-r|-resolve|\
 -n:|-netns:|-N|-Numeric|-a|-all|-t|-timestamp|-ts|-tshort|-rc:|-rcvbuf:|-iec|\
@@ -879,7 +880,7 @@ veth\nvlan\nvrf\nvti\nvxcan\nvxlan\nwwan\nxfrm'
             route) _ip_route ;;
             sr) _ip_sr ;;
             tap | tuntap) _ip_tap ;;
-            tcpmetrics | tcp_metrics) _ip_tcpmetrics ;;
+            tcpmetrics) _ip_tcpmetrics ;;
             token) _ip_token ;;
             tunnel) _ip_tunnel ;;
             vrf) _ip_vrf ;;
