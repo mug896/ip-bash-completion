@@ -825,7 +825,6 @@ _ip_main()
     prev2=${COMP_WORDS[COMP_CWORD-2]}
 
     objs=$( $cmd -h |& sed -Ez 's/.*OBJECT := \{([^}]+)}.*/\1/; s/[ \t\n]+//g;' )
-    objs+=$'\naddr\nmaddr'
     options="-V|-Version|-h|-human|-human-readable|-b:|-batch:|-s|-stats|-statistics|\
 -d|-details|-l:|-loops:|-f:|-family:|-4|-6|-B|-M|-0|-o|-oneline|-r|-resolve|\
 -n:|-netns:|-N|-Numeric|-a|-all|-t|-timestamp|-ts|-tshort|-rc:|-rcvbuf:|-iec|\
@@ -859,7 +858,7 @@ geneve\ngre\ngretap\nifb\nip6erspan\nip6gre\nip6gretap\nip6tnl\nipip\nipoib\nipv
 ipvtap\nmacsec\nmacvlan\nmacvtap\nnetdevsim\nnlmon\nrmnet\nsit\nteam\nteam_slave\nvcan
 veth\nvlan\nvrf\nvti\nvxcan\nvxlan\nwwan\nxfrm'
         case $cmd2 in
-            address | addr) _ip_address ;;
+            address) _ip_address ;;
             addrlabel) _ip_addrlabel ;;
             fou) _ip_fou ;;
             ila) _ip_ila ;;
@@ -867,7 +866,7 @@ veth\nvlan\nvrf\nvti\nvxcan\nvxlan\nwwan\nxfrm'
             l2tp) _ip_l2tp ;;
             link) _ip_link ;;
             macsec) _ip_macsec ;;
-            maddress | maddr) _ip_maddress ;;
+            maddress) _ip_maddress ;;
             monitor) _ip_monitor ;;
             mptcp) _ip_mptcp ;;
             mroute) _ip_mroute ;;
