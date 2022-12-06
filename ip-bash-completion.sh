@@ -750,7 +750,7 @@ _ip()
     trap "$extglob_reset" RETURN
     shopt -s extglob
 
-    local nsname IFS=$' \t\n' i
+    local IFS=$' \t\n' nsname i
     COMP_LINE=${COMP_LINE:0:$COMP_POINT}
 
     if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+([[:alnum:]_-]+)[ ]+)(.*) ]]; then
