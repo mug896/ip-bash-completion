@@ -755,6 +755,17 @@ _ip()
 
     if [[ $COMP_LINE =~ ^(ip[ ]+(-n|-netns)[ ]+([[:alnum:]_-]+)[ ]+)(.*) ]]; then
         nsname=${BASH_REMATCH[3]}
+        COMP_LINE="ip ${BASH_REMATCH[4]}"
+        COMP_POINT=${#COMP_LINE}
+        for (( i = 0; i < $COMP_CWORD; i++ )); do
+            if [[ ${COMP_WORDS[i]} == @(-n|-netns) ]]; then
+                unset -v 'COMP_WORDS[i]' 'COMP_WORDS[i+1]'
+                COMP_WORDS=( "ip" "${COMP_WORDS[@]}" )
+                let COMP_CWORD-=i+1
+                break
+            fi
+            unset -v 'COMP_WORDS[i]'
+        done
         _ip_main "$@"
 
     elif [[ $COMP_LINE =~ ^(ip[ ]+((-a|-all)[ ]+)?netns[ ]+exec[ ]+)(.*) ]]; then
