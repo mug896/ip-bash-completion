@@ -810,7 +810,7 @@ _ip_main()
 
     COMP_LINE=${COMP_LINE:0:$COMP_POINT}
     cur=${COMP_WORDS[COMP_CWORD]} cur_o=$cur
-    [[ ${COMP_LINE: -1} = " " || $COMP_WORDBREAKS == *$cur* ]] && cur=""
+    [[ ${COMP_LINE: -1} = " " || $COMP_WORDBREAKS == *"$cur"* ]] && cur=""
     prev=${COMP_WORDS[COMP_CWORD-1]} prev_o=$prev
     [[ $prev == [,=] ]] && prev=${COMP_WORDS[COMP_CWORD-2]}
     prev2=${COMP_WORDS[COMP_CWORD-2]}
