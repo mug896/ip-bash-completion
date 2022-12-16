@@ -11,15 +11,16 @@ _init_comp_wordbreaks()
 }
 _ip_data()
 {
+    local sudo=$( [[ $EUID != 0 ]] && echo sudo )
     if [[ $1 == interface ]]; then
         if [[ -n $nsname ]]; then
-            sudo ip -n $nsname link show $2
+            $sudo ip -n $nsname link show $2
         else
             ip link show $2 
         fi | sed -En 's/^[0-9]+:[ ]+([^@:]+).*/\1/p'
     elif [[ $1 == route ]]; then
         local command
-        [[ -n $nsname ]] && command="sudo ip -n $nsname route" || 
+        [[ -n $nsname ]] && command="$sudo ip -n $nsname route" || 
                             command="ip route"
         if [[ $2 == default ]]; then
             $command | sed -En 's/.* via ([0-9.]*).*/\1/p'
