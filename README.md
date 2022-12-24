@@ -23,7 +23,7 @@ ila         maddress    neighbor    ntable      tap         vrf
 
 ## Usage
 
-Basically, capitalized words are values that the user have to enter.
+Basically, capitalized words are values that the user has to enter.
 
 ```sh
 bash$ ip route add PREFIX via ADDRESS
