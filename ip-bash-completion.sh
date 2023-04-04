@@ -747,8 +747,7 @@ _ip()
     _init_comp_wordbreaks
     COMP_WORDBREAKS=${COMP_WORDBREAKS//:/}
 
-    local extglob_reset=$(shopt -p extglob)
-    trap "$extglob_reset" RETURN
+    trap "$(shopt -p extglob)" RETURN
     shopt -s extglob
 
     local IFS=$' \t\n' nsname i
