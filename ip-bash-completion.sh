@@ -273,7 +273,8 @@ _ip_link_add()
     esac
     [[ ${sub_line/%+( )/} == @(link|parentdev)+( )+([^ ]) ]] && words="name"
     [[ -n $words ]] && return
-    opts=$'txqueuelen\naddress\nbroadcast\nmtu\nindex\nnumtxqueues\nnumrxqueues\ntype'
+    opts=$'txqueuelen\naddress\nbroadcast\nmtu\nindex\nnumtxqueues\nnumrxqueues
+netns\ntype'
     _ip_link_type
 }
 _ip_link_set()
